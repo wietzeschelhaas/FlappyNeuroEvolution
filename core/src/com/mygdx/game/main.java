@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -13,10 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.FillViewport;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.*;
 
@@ -64,9 +62,13 @@ public class main extends ApplicationAdapter {
 		dieded = new ArrayList<Bird>();
 
 		//init the first generation
-		for (int i = 0; i < popSize; i++) {
+		NN brain = restoreNN();
+		Bird b = new Bird(pipe);
+		b.brain = brain;
+		population.add(b);
+		/*for (int i = 0; i < popSize; i++) {
 			population.add(new Bird(pipe));
-		}
+		}*/
 
 
 		fps = new FPSLogger();
@@ -126,7 +128,7 @@ public class main extends ApplicationAdapter {
 		}
 
 		if(Gdx.input.justTouched()){
-			randomRestart();
+			//saveNN(population.get(0).brain);
 		}
 
 		fps.log();
@@ -209,6 +211,31 @@ public class main extends ApplicationAdapter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	NN restoreNN(){
+		NN brain = null;
+		try {
+			FileHandle file = Gdx.files.internal(filename);
+			brain = (NN)deserialize(file.readBytes());
+
+		}
+
+		catch (IOException ex) {
+			System.out.println("IOException is caught");
+		}
+
+		catch (ClassNotFoundException ex) {
+			System.out.println("ClassNotFoundException" +
+					" is caught");
+		}
+		return brain;
+	}
+
+	public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+		ObjectInputStream o = new ObjectInputStream(b);
+		return o.readObject();
 	}
 	@Override
 	public void dispose () {

@@ -1,8 +1,9 @@
 package com.mygdx.game;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
-public class Matrix {
+public class Matrix implements Serializable {
     float[][] matrix;
     int rows;
     int columns;
